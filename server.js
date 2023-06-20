@@ -9,7 +9,7 @@ const itemRouter = require('./contorller/item')
 const userRouter = require('./contorller/user')
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3000', // อนุญาติให้เฉพาะ domain นี้เท่านั้น
     optionsSuccessStatus: 200 
 }
 

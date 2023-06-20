@@ -30,7 +30,7 @@ const checkToken = (token,secretKey) => {
 
   // check password 
 const checkPassword = async(password,Store) => {
-    const isPasswordMatch = await bcrypt.compare(password, Store)
+    let isPasswordMatch = await bcrypt.compare(password, Store)
     // console.log(isPasswordMatch)
     return isPasswordMatch
 }

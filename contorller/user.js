@@ -92,16 +92,28 @@ router.post('/loginUser', async(req,res) => {
               } else {
                 if (result.length > 0) {
                      const is_password = checkPassword(password,result[0].password)
-                    if(is_password){
-                        // console.log("id ====> ",result[0].id_user)
-                        // console.log("username ====> ",result[0].username)
-                        const user = { id: result[0].id_user, username: result[0].username }
-                        const token = jwt.sign(user, secretKey, { expiresIn: '24h' })
-                        // console.log(token)
-                        return res.status(200).json({ message: 'เข้าสู่ระบบสำเร็จ',payload: result,token,expiresIn: '24h' })
-                    }else{
-                        return res.status(401).json({ message: 'รหัสผ่านไม่ถูกต้อง' })
-                    }
+                     is_password.then(function(is_password) {
+                        // console.log("is_password ====> ",result)
+                        if(is_password){
+                            console.log(result)
+                            // console.log("id ====> ",result[0].id_user)
+                            // console.log("username ====> ",result[0].username)
+                            const user = { id: result[0].id_user, username: result[0].username }
+                            const token = jwt.sign(user, secretKey, { expiresIn: '24h' })
+                            let payload = {
+                                "id_user" : result[0].id_user,
+                                "username" : result[0].username,
+                                "password" : result[0].password,
+                                "nickname" : result[0].nickname,
+                                "status_user" : result[0].status_user,
+                                "token" : token,
+                                "expiresIn" : '24h' 
+                            }
+                            return res.status(200).json({ code:200,message: 'เข้าสู่ระบบสำเร็จ',payload: payload})
+                        }else{
+                            return res.status(200).json({ message: 'รหัสผ่านไม่ถูกต้อง' })
+                        }
+                     })
                 } else {
                   return res.status(401).json({ message: 'เกิดข้อผิดพลาด' })
                 }
