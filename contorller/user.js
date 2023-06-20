@@ -36,7 +36,7 @@ router.post('/registerUser', async (req, res) => {
                 if (err) {
                     console.log("Error ====> ", err)
                     // console.log("Error")
-                    return res.status(201).json({message: "มีชื่อผู้ใช้นี้ในระบบแล้ว"})
+                    return res.status(201).json({ message: "มีชื่อผู้ใช้นี้ในระบบแล้ว"})
                 } else {
                     if(result.length > 0){
                         return res.status(201).json({ message: "มีชื่อผู้ใช้นี้อยู่ในระบบแล้ว...." })
@@ -44,7 +44,7 @@ router.post('/registerUser', async (req, res) => {
                         // create user
                         connect.query(
                             "INSERT INTO user(username,password,nickname,status_user) VALUES (?,?,?,?)",
-                            [username,hashedPassword,nickname,status],
+                            [username,hashedPassword,nickname,status_user],
                             (err, result, fields) => {
                                 if (err) {
                                     console.log("Error ====> ", err)
