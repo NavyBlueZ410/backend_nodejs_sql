@@ -4,14 +4,13 @@ const connect = require('../database/connect')
 let jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const { checkToken,checkPassword } = require('./check_token_password')
-const connection = require('../database/connect')
+const db = require('../database/connect')
 
 const secretKey = 'a'
 
 // registerUser
 router.post('/registerUser', async (req, res) => {
-    const {username,password,nickname,status} = req.body;
-
+    const {username,password,nickname,status_user} = req.body;
     switch(true){
         case(!username):
             res.status(400).json({ code: 404, message: "กรุณากรอก username" })
@@ -22,7 +21,7 @@ router.post('/registerUser', async (req, res) => {
         case(!nickname):
             res.status(400).json({ code: 404, message: "กรุณากรอก nickname" })
             break
-        case(!status):
+        case(!status_user):
             res.status(400).json({ code: 404, message: "กรุณาเลือก status " })
             break
         default: break
@@ -30,15 +29,14 @@ router.post('/registerUser', async (req, res) => {
 
     try{
         const hashedPassword = await bcrypt.hash(password,10)
-
         // check username
         connect.query(
-            'SELECT * FROM user WHERE username = ?',
-            [username],
+            'SELECT * FROM user WHERE username = ?',[username],
             (err, result, fields) => {
                 if (err) {
                     console.log("Error ====> ", err)
-                    return res.status(400).send()
+                    // console.log("Error")
+                    return res.status(201).json({message: "มีชื่อผู้ใช้นี้ในระบบแล้ว"})
                 } else {
                     if(result.length > 0){
                         return res.status(201).json({ message: "มีชื่อผู้ใช้นี้อยู่ในระบบแล้ว...." })
@@ -52,7 +50,7 @@ router.post('/registerUser', async (req, res) => {
                                     console.log("Error ====> ", err)
                                     return res.status(400).send()
                                 } else {
-                                    return res.status(201).json({ message: "สมัครสมาชิกสำเร็จ" })
+                                    return res.status(201).json({ code:200,message: "สมัครสมาชิกสำเร็จ" })
                                 }
                             }
                         )
@@ -95,7 +93,6 @@ router.post('/loginUser', async(req,res) => {
                      is_password.then(function(is_password) {
                         // console.log("is_password ====> ",result)
                         if(is_password){
-                            console.log(result)
                             // console.log("id ====> ",result[0].id_user)
                             // console.log("username ====> ",result[0].username)
                             const user = { id: result[0].id_user, username: result[0].username }
@@ -103,7 +100,6 @@ router.post('/loginUser', async(req,res) => {
                             let payload = {
                                 "id_user" : result[0].id_user,
                                 "username" : result[0].username,
-                                "password" : result[0].password,
                                 "nickname" : result[0].nickname,
                                 "status_user" : result[0].status_user,
                                 "token" : token,
@@ -115,7 +111,7 @@ router.post('/loginUser', async(req,res) => {
                         }
                      })
                 } else {
-                  return res.status(401).json({ message: 'เกิดข้อผิดพลาด' })
+                  return res.status(200).json({ message: 'ชื่อผู้ใช้ไม่ถูกต้อง' })
                 }
               }
             }
@@ -156,7 +152,7 @@ router.get('/getUser', async(req,res) => {
 
 // updateUser
 router.post('/updateUser', async(req,res) => {
-    const { id_user,username,password,nickname,status } = req.body;
+    const { id_user,username,nickname,status_user } = req.body;
 
     switch(true){
         case(!id_user):
@@ -165,33 +161,29 @@ router.post('/updateUser', async(req,res) => {
         case(!username):
             res.status(400).json({ code: 404, message: "กรุณากรอก username" })
             break
-        case(!password):
-            res.status(400).json({ code: 404, message: "กรุณากรอก password" })
-            break
         case(!nickname):
             res.status(400).json({ code: 404, message: "กรุณากรอก nickname" })
             break
-        case(!status):
+        case(!status_user):
             res.status(400).json({ code: 404, message: "กรุณาเลือก status " })
             break
         default: break
     } 
-    const hashedPassword = await bcrypt.hash(password,10)
     const token = req.headers['authorization']
     const decodedToken = checkToken(token,secretKey)
 
     if(decodedToken){
         try{
             connect.query(
-                `UPDATE user SET username = ? , password = ? , nickname = ? , status_user = ?
+                `UPDATE user SET username = ? , nickname = ? , status_user = ?
                 WHERE id_user = ? `,
-                [username,hashedPassword,nickname,status,id_user],
+                [username,nickname,status_user,id_user],
                 (err, result, fields) => {
                     if (err) {
                         console.log("Error ====> ", err);
                         return res.status(400).send();
                     } else {
-                        return res.status(201).json({ message: "อัพเดพข้อมูลสำเร็จ" })
+                        return res.status(200).json({ code:200,message: "อัพเดพข้อมูลสำเร็จ" })
                     }
                 }
             )
@@ -212,7 +204,7 @@ router.delete('/deleteUser', async(req,res) => {
 
     if(decodedToken){
         try{
-            connection.query("DELETE FROM user WHERE id_user = ?",[id_user], (err, result, fields) => {
+            db.query("DELETE FROM user WHERE id_user = ?",[id_user], (err, result, fields) => {
                 if (err) {
                     console.log("Error ====> ", err);
                     return res.status(400).send();

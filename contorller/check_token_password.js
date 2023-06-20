@@ -5,11 +5,6 @@ const bcrypt = require('bcrypt')
 const checkToken = (token,secretKey) => {
     // console.log("token ====> ",token)
     try{
-        if (!token) {
-            console.log('Token not provided')
-            return null
-        }
-    
         const tokenWithoutBearer = token.replace('Bearer ', '')
         const decoded = jwt.verify(tokenWithoutBearer, secretKey)
         
