@@ -11,10 +11,10 @@ const userRouter = require('./contorller/user')
 const corsOptions = {
     origin: 'http://localhost:3000',
     optionsSuccessStatus: 200 
-  }
+}
 
 app.use('/item', cors(corsOptions), itemRouter)
 app.use(cors(corsOptions),userRouter)
 
 
-app.listen(3000, () => console.log('Server is running port 3000.....'))
+app.listen(5000, () => console.log('Server is running port 5000.....'))
